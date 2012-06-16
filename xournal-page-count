@@ -6,8 +6,9 @@
 set -e
 set -u
 
-# Cost of one sheet of paper, measured in €.
-cost_per_page=0.01
+# Cost of one sheet of paper, measured in €. This assumes that a box with 2500
+# sheets costs 19.95€.
+cost_per_page=0.00798
 
 # Height per page, measured in meters.
 height_per_page=0.0001
