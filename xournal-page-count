@@ -21,8 +21,8 @@ do
 	echo "$file has $pages"
 done
 
-height=$((height_per_page * sum))
-cost=$((cost_per_page * sum))
+height=$(python -c "print $height_per_page * $sum")
+cost=$(python -c "print $cost_per_page * $sum")
 
 echo
 
