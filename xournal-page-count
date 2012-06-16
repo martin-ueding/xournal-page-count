@@ -33,6 +33,6 @@ echo
 
 echo "Total:"
 echo "    $sum pages."
-echo "    $height meters."
+echo "    $height meters in height."
 echo "    $mass kilograms"
 echo "    $cost €."
