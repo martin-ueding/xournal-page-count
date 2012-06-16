@@ -6,6 +6,12 @@
 set -e
 set -u
 
+# Cost of one sheet of paper, measured in €.
+cost_per_page=0.01
+
+# Height per page, measured in meters.
+height_per_page=0.0001
+
 sum=0
 
 for file in "$@"
@@ -14,3 +20,13 @@ do
 	sum=$((sum + pages))
 	echo "$file has $pages"
 done
+
+height=$((height_per_page * sum))
+cost=$((cost_per_page * sum))
+
+echo
+
+echo "Total:"
+echo "    $sum pages."
+echo "    $height meters."
+echo "    $cost €."
