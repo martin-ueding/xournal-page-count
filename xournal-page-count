@@ -12,6 +12,9 @@ cost_per_page=0.01
 # Height per page, measured in meters.
 height_per_page=0.0001
 
+# Mass per page, measured in kilograms.
+mass_per_page=0.005
+
 sum=0
 
 for file in "$@"
@@ -23,10 +26,12 @@ done
 
 height=$(python -c "print $height_per_page * $sum")
 cost=$(python -c "print $cost_per_page * $sum")
+mass=$(python -c "print $mass_per_page * $sum")
 
 echo
 
 echo "Total:"
 echo "    $sum pages."
 echo "    $height meters."
+echo "    $mass kilograms"
 echo "    $cost €."
