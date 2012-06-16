@@ -22,7 +22,7 @@ for file in "$@"
 do
 	pages="$(gunzip -c "$file" | grep '<page' | wc -l)"
 	sum=$((sum + pages))
-	echo "$file has $pages"
+	printf "%3d pages in %s\n" "$pages" "$file"
 done
 
 height=$(python -c "print $height_per_page * $sum")
