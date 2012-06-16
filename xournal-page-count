@@ -1,7 +1,13 @@
 #!/bin/bash
 # Copyright (c) 2012 Martin Ueding <dev@martin-ueding.de>
 
+# Counts the number of pages in the given Xournal documents.
+
 set -e
 set -u
 
-
+for file in "$@"
+do
+	pages="$(gunzip -c "$file" | grep '<page' | wc -l)"
+	echo "Pages: $pages"
+done
