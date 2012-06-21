@@ -53,7 +53,7 @@ for file in "$@"
 do
 	case "$file" in
 		*.xoj)
-			pages="$(gunzip -c "$file" | grep '<page' | wc -l)"
+			pages="$(zgrep -Ec '<page' "$file")"
 			;;
 		*.pdf)
 			pages="$(grep -Ec '/Page$' "$file")"
