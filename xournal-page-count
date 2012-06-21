@@ -1,11 +1,11 @@
 #!/bin/bash
-# Copyright (c) 2012 Martin Ueding <dev@martin-ueding.de>
 
 # Counts the number of pages in the given Xournal documents.
 
 # License (BSD-3-clause)
 # ======================
 #
+# Copyright (c) 2012 Martin Ueding <dev@martin-ueding.de>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
