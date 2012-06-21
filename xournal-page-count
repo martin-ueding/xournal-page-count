@@ -55,7 +55,7 @@ do
 			pages="$(zgrep -Ec '<page' "$file")"
 			;;
 		*.pdf)
-			pages="$(grep -Ec '/Page$' "$file")"
+			pages="$(pdfinfo "$file" | grep Pages | awk '{print $2}')"
 			;;
 	esac
 	sum=$((sum + pages))
