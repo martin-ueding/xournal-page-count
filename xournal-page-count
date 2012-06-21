@@ -51,7 +51,14 @@ sum=0
 
 for file in "$@"
 do
-	pages="$(gunzip -c "$file" | grep '<page' | wc -l)"
+	case "$file" in
+		*.xoj)
+			pages="$(gunzip -c "$file" | grep '<page' | wc -l)"
+			;;
+		*.pdf)
+			pages="$(grep -Ec '/Page$' "$file")"
+			;;
+	esac
 	sum=$((sum + pages))
 	printf "%3d pages in %s\n" "$pages" "$file"
 done
