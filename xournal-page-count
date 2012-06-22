@@ -72,15 +72,23 @@ def main():
     print "    {cost:.2f} €".format(cost=cost_per_page*total_pages)
 
 def get_xournal_pages(filename):
-    count = subprocess.check_output(["zgrep", "-Ec", "<page", filename])
-    return int(count)
+    try:
+        count = subprocess.check_output(["zgrep", "-Ec", "<page", filename])
+    except subprocess.CalledProcessError:
+        return 0
+    else:
+        return int(count)
 
 def get_pdf_pages(filename):
-    pdfinfo = subprocess.check_output(["pdfinfo", filename]).split("\n")
-    for line in pdfinfo:
-        if line.startswith("Pages:"):
-            parts = line.split()
-            return int(parts[-1])
+    try:
+        pdfinfo = subprocess.check_output(["pdfinfo", filename]).split("\n")
+    except subprocess.CalledProcessError:
+        return 0
+    else:
+        for line in pdfinfo:
+            if line.startswith("Pages:"):
+                parts = line.split()
+                return int(parts[-1])
 
 def _parse_args():
     """
