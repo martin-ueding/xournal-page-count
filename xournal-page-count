@@ -1,81 +1,98 @@
-#!/bin/bash
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 
-# Counts the number of pages in the given Xournal documents.
-
-# License (BSD-3-clause)
-# ======================
-#
 # Copyright (c) 2012 Martin Ueding <dev@martin-ueding.de>
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# - Redistributions of source code must retain the above copyright notice,
-#   this list of conditions and the following disclaimer.
-#
-# - Redistributions in binary form must reproduce the above copyright notice,
-#   this list of conditions and the following disclaimer in the documentation
-#   and/or other materials provided with the distribution.
-#
-# - Neither the name of the Martin Ueding nor the names of his contributors
-#   may be used to endorse or promote products derived from this software
-#   without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
 
-set -u
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
-# Cost of one sheet of paper, measured in €. This assumes that a box with 2500
-# sheets costs 19.95€.
+import argparse
+import subprocess
+
+__docformat__ = "restructuredtext en"
+
 cost_per_page=0.00798
+"""
+Cost of one sheet of paper, measured in €. This assumes that a box with 2500
+sheets costs 19.95€.
+"""
 
-# Height per page, measured in meters.
 height_per_page=0.0001
+"Height per page, measured in meters."
 
-# Mass per page, measured in kilograms.
 mass_per_page=0.005
+"Mass per page, measured in kilograms."
 
-sum=0
+def main():
+    options = _parse_args()
 
-for file in "$@"
-do
-	pages=0
-	case "$file" in
-		*.xoj.pdf)
+    total_pages = 0
+
+    for filename in options.files:
+        pages = 0
+
+        if filename.endswith(".xoj.pdf"):
 			# Ignore exported Xournal files. The original files will be counted
 			# in the next case.
-			continue
-			;;
-		*.xoj)
-			pages="$(zgrep -Ec '<page' "$file")"
-			;;
-		*.pdf)
-			pages="$(pdfinfo "$file" | grep Pages | awk '{print $2}')"
-			;;
-	esac
-	sum=$((sum + pages))
-	printf "%3d pages in %s\n" "$pages" "$file"
-done
+            continue
+        elif filename.endswith(".xoj"):
+            pages = get_xournal_pages(filename)
+        elif filename.endswith(".pdf"):
+            pages = get_pdf_pages(filename)
 
-height=$(python -c "print $height_per_page * $sum")
-cost=$(python -c "print $cost_per_page * $sum")
-mass=$(python -c "print $mass_per_page * $sum")
+        total_pages += pages
 
-echo
+        print "{pages:3d} {filename}".format(
+            pages=pages,
+            filename=filename,
+        )
 
-echo "Total:"
-echo "    $sum pages."
-echo "    $height meters in height."
-echo "    $mass kilograms"
-echo "    $cost €."
+    print
+    print "Total"
+    print "    {total} pages".format(total=total_pages)
+    print "    {height:.3f} meters in height".format(height=height_per_page*total_pages)
+    print "    {mass:.3f} kilograms".format(mass=mass_per_page*total_pages)
+    print "    {cost:.2f} €".format(cost=cost_per_page*total_pages)
+
+def get_xournal_pages(filename):
+    count = subprocess.check_output(["zgrep", "-Ec", "<page", filename])
+    return int(count)
+
+def get_pdf_pages(filename):
+    pdfinfo = subprocess.check_output(["pdfinfo", filename]).split("\n")
+    for line in pdfinfo:
+        if line.startswith("Pages:"):
+            parts = line.split()
+            return int(parts[-1])
+
+def _parse_args():
+    """
+    Parses the command line arguments.
+
+    :return: Namespace with arguments.
+    :rtype: Namespace
+    """
+    parser = argparse.ArgumentParser(usage="", description="")
+    parser.add_argument("files", metavar="files", type=str, nargs="+",
+                   help="Filenames to process")
+
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    main()
