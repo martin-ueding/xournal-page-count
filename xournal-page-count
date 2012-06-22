@@ -54,6 +54,8 @@ def main():
             pages = get_xournal_pages(filename)
         elif filename.endswith(".pdf"):
             pages = get_pdf_pages(filename)
+        elif filename.endswith(".jpg"):
+            pages = 1
 
         total_pages += pages
 
