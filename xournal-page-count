@@ -50,6 +50,7 @@ sum=0
 
 for file in "$@"
 do
+	pages=0
 	case "$file" in
 		*.xoj.pdf)
 			# Ignore exported Xournal files. The original files will be counted
