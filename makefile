@@ -1,7 +1,7 @@
-# Copyright (c) 2012 Martin Ueding <dev@martin-ueding.de>
+# Copyright © 2012-2013 Martin Ueding <dev@martin-ueding.de>
 
 all:
-	@echo "This makefile only provides a “make install” target."
 
 install:
-	install xournal-page-count $(DESTDIR)/usr/bin/
+	install -d "$(DESTDIR)/usr/bin"
+	install xournal-page-count -t "$(DESTDIR)/usr/bin"
